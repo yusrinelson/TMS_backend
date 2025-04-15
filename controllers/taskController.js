@@ -19,8 +19,19 @@ const createTask = async (req, res) => {
     const {goalId} = req.params;
     const {title, description, status, isCompleted} = req.body;
 
+    let emptyFields = [];
+
     if (!title) {
-        return res.status(404).json({message: 'Please add a title'});
+        emptyFields.push('title');
+    }
+    if (!description) {
+        emptyFields.push('description');
+    }
+    if (!status) {
+        emptyFields.push('status');
+    }
+    if(emptyFields.length > 0) {
+        return res.status(400).json({ error: 'Please fill in all the fields', emptyFields })
     }
 
     try{
@@ -53,12 +64,12 @@ const deleteTask = async (req, res) => {
     const { id } = req.params
 
     try{
-        const deletTask = await Task.findByIdAndDelete(id);
-        if(!deletTask) return res.status(404).json({message: 'Task not found'});
+        const deletedTask = await Task.findByIdAndDelete(id);
+        if(!deletedTask) return res.status(404).json({message: 'Task not found'});
 
-        res.status(200).json({message: 'Task deleted successfully'});
+        res.status(200).json(deletedTask);
     } catch(error){
-        res.status(404).json({ message: "Goal not found" });
+        res.status(404).json({ message: "Task not found" });
     }
     
 }
